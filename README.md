@@ -17,17 +17,13 @@ The tool is implemented as a Streamlit web app with rule-based, NLP-based, and r
 ---
 
 ## Scoring Formula
-
-Let each criterion \( i \) have:
-
-- Weight \( w_i \) (e.g. 40 for Content & Structure)
-- Normalised score \( s_i \in [0,1] \)
+Let:
+- **wᵢ** = weight of criterion i  
+- **sᵢ** = normalized score of criterion i in range [0, 1]
 
 Then the final score is:
 
-\[
-\text{Overall Score} = \frac{\sum_i w_i s_i}{\sum_i w_i} \times 100
-\]
+Overall Score = ( Σ (wᵢ × sᵢ) / Σ wᵢ ) × 100
 
 ### Content & Structure (40)
 
@@ -43,14 +39,13 @@ Signals used:
 
 Combination:
 
-\[
-s_{\text{content}} =
-0.6 \cdot \text{must\_have\_ratio} +
-0.15 \cdot \text{good\_have\_ratio} +
-0.15 \cdot \text{length\_score} +
-0.1 \cdot \text{semantic\_score} +
-\text{greeting/closing bonus}
-\]
+Content Score =
+  0.60 × must_have_ratio
++ 0.15 × good_to_have_ratio
++ 0.15 × length_score
++ 0.10 × semantic_similarity
++ greeting/closing_bonus
+
 
 ### Speech Rate (10)
 
@@ -59,9 +54,7 @@ s_{\text{content}} =
 - `length_score(words, 80, 140)` returns 1 inside range, decreasing to 0 outside.
 - Normalised score:
 
-\[
-s_{\text{speech}} = \text{length\_score}
-\]
+Speech Score = length_score(words, min=80, max=140)
 
 ### Language & Grammar (20)
 
@@ -70,9 +63,8 @@ s_{\text{speech}} = \text{length\_score}
 - NLP-based:
   - Semantic similarity with rubric description (“simple but correct sentences, reasonably rich vocabulary”).
 
-\[
-s_{\text{lang}} = 0.7 \cdot \text{ttr\_score} + 0.3 \cdot \text{semantic\_score}
-\]
+Language Score = (0.70 × TTR) + (0.30 × semantic_similarity)
+
 
 ### Clarity (15)
 
@@ -80,15 +72,14 @@ s_{\text{lang}} = 0.7 \cdot \text{ttr\_score} + 0.3 \cdot \text{semantic\_score}
   - Count filler words like *um, uh, you know, like, sort of, kind of*.
   - Compute fillers per 100 words and map to a score from 0.2 to 1.0.
 
+
 ### Engagement / Positivity (15)
 
 - NLP-based:
   - Sentiment analysis (VADER).  
   - VADER compound ∈ [−1,1] is mapped to [0,1]:
 
-\[
-s_{\text{engagement}} = \frac{\text{compound} + 1}{2}
-\]
+Engagement Score = (VADER_compound + 1) / 2
 
 ---
 
